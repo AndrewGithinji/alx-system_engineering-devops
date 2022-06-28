@@ -1,2 +1,2 @@
 #!/bin/bash
-prints local,env and func
+prints local,env and func | set
