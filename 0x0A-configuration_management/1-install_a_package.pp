@@ -1,5 +1,5 @@
 # installing puppet link
 package { 'puppet-lint':
-    ensure   => '2.1.1',
+    ensure   => '2.4.2',
     provider => 'gem',
 }
