@@ -13,7 +13,8 @@ global
         crt-base /etc/ssl/private
 
         # See: https://ssl-config.mozilla.org/#server=haproxy&server-version=2.0.3&config=intermediate
-        ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY$
+        ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+        ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
         ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
 
 defaults
@@ -32,17 +33,19 @@ defaults
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
 
-frontend www-http
-    bind *:80
-    mode http
-    default_backend webserver
-frontend www-https
-        bind *:443 ssl crt /etc/haproxy/certs/www.andrewg.tech
-        default_backend webserver
-backend webserver
-    balance roundrobin
-    server 2152-web-01 54.234.32.121 check
-    server 2152-web-02 54.236.16.64 check
+frontend webserver
+        bind *:80
+        mode http
+        stats enable
+        stats uri /haproxy?status
+        default_backend webserver2
 
+frontend webserver-frontend-https
+        bind *:443 ssl crt /etc/haproxy/certs/www.andrewg.tech.pem
+        http-request set-header X-Forwarded-Proto https
+        default_backend webserver2-backend
 
-
+backend webserver2
+        balance leastconn
+        server 78255-web-01 54.234.32.121:80 check
+        server 78255-web-02 54.236.16.64:80 check
