@@ -41,7 +41,7 @@ frontend webserver
         default_backend webserver2
 
 frontend webserver
-        bind *:443 ssl crt /etc/haproxy/certs/www.andrewg.tech.pem
+        bind *:80 ssl crt /etc/haproxy/certs/www.andrewg.tech.pem
         default_backend webserver2
 
 backend webserver2
